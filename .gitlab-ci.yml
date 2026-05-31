@@ -1,0 +1,12 @@
+# Gitlab CI/CD
+pages:
+  stage: deploy
+  image: reg.nju.edu.cn/nju-network-course/network-exp-docs:python-3.9
+  script:
+    - pip3 install mkdocs-material
+    - mkdocs build --site-dir public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
