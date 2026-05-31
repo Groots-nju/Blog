@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block tabs %}
+  {{ super() }}
+  {% if page and page.meta and page.meta.template == "home.html" %}
+  <style>
+    /* 隐藏默认主体，首页完全自定义 */
+    .md-header { position: initial }
+    .md-main__inner { margin: 0 }
+    .md-content { display: none }
+    @media screen and (min-width: 60em)    { .md-sidebar--secondary { display: none } }
+    @media screen and (min-width: 76.25em) { .md-sidebar--primary   { display: none } }
+  </style>
+
+  <!-- ═══ HERO ═══ -->
+  <div class="mdx-hero-wrap">
+    <div class="mdx-hero-bg" id="heroBg"
+         style="background-image: url('{{ base_url }}/assets/56.png')"></div>
+    <div class="mdx-hero-overlay" id="heroOverlay"></div>
+    <div class="mdx-hero-body" id="heroBody">
+      <div class="md-grid">
+        <p class="mdx-hero-eyebrow">✦ 欢迎来到我的空间</p>
+        <h1 class="mdx-hero-title">{{ page.meta.title | default(config.site_name) }}</h1>
+        <p class="mdx-hero-desc">{{ page.meta.description | default("") }}</p>
+        <div class="mdx-hero-btns">
+          {% if page.meta.hero_button %}
+          <a href="{{ page.meta.hero_button_link | default('#') }}" class="mdx-btn mdx-btn--primary">
+            {{ page.meta.hero_button }}
+          </a>
+          {% endif %}
+          {% if page.meta.hero_button2 %}
+          <a href="{{ page.meta.hero_button2_link | default('#') }}" class="mdx-btn">
+            {{ page.meta.hero_button2 }}
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="mdx-hero-arrow">
+        <svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 特色卡片区 ═══ -->
+  <section class="mdx-section mdx-features">
+    <div class="md-grid md-typeset">
+      <h2 class="mdx-section-title">探索内容</h2>
+      <p class="mdx-section-sub">用文字记录所见、所思、所感</p>
+      <div class="mdx-feat-grid">
+        <a class="mdx-feat-card" href="{{ base_url }}/note1/">
+          <div class="mdx-feat-icon">🌿</div>
+          <h3>自然与旅行</h3>
+          <p>走过的风景，值得被好好记录下来。</p>
+        </a>
+        <a class="mdx-feat-card" href="{{ base_url }}/note2/">
+          <div class="mdx-feat-icon">✏️</div>
+          <h3>关于本站</h3>
+          <p>这个网站是怎么搭建的，以及我在这里做什么。</p>
+        </a>
+        <a class="mdx-feat-card" href="{{ base_url }}/guide/">
+          <div class="mdx-feat-icon">📖</div>
+          <h3>使用说明</h3>
+          <p>如何添加笔记、插入图片、发布到网上。</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 最新笔记区 ═══ -->
+  <section class="mdx-section mdx-latest">
+    <div class="md-grid md-typeset">
+      <h2 class="mdx-section-title">最新笔记</h2>
+      <p class="mdx-section-sub">近期写下的一些片段</p>
+      <div class="mdx-posts">
+        <a class="mdx-post" href="{{ base_url }}/note1/page1/">
+          <div class="mdx-post-img" style="background-image:url('https://images.unsplash.com/photo-1598135753163-6167c1a1ad65?w=600&q=80')"></div>
+          <div class="mdx-post-body">
+            <span class="mdx-tag">自然</span>
+            <h3>山间晨雾</h3>
+            <p>清晨的山谷，薄雾如纱，一切都安静而美好。</p>
+          </div>
+        </a>
+        <a class="mdx-post" href="{{ base_url }}/note1/page2/">
+          <div class="mdx-post-img" style="background-image:url('https://images.unsplash.com/photo-1534430480872-3498386e7856?w=600&q=80')"></div>
+          <div class="mdx-post-body">
+            <span class="mdx-tag">旅行</span>
+            <h3>樱花季</h3>
+            <p>花开一周，所以才值得去看。</p>
+          </div>
+        </a>
+        <a class="mdx-post" href="{{ base_url }}/note1/page3/">
+          <div class="mdx-post-img" style="background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80')"></div>
+          <div class="mdx-post-body">
+            <span class="mdx-tag">风景</span>
+            <h3>海边黄昏</h3>
+            <p>有些颜色，调色板里根本没有。</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 引言区 ═══ -->
+  <section class="mdx-section mdx-quote-section">
+    <div class="md-grid md-typeset">
+      <blockquote class="mdx-big-quote">
+        "写作不是为了让别人看，<br>是为了让自己不忘记。"
+      </blockquote>
+    </div>
+  </section>
+
+  <script>
+  (function () {
+    var bg      = document.getElementById('heroBg');
+    var overlay = document.getElementById('heroOverlay');
+    var body    = document.getElementById('heroBody');
+
+    function tick() {
+      var y = window.scrollY || window.pageYOffset;
+      var H = window.innerHeight;
+      var r = Math.min(y / (H * 0.65), 1);
+      if (bg)      bg.style.transform      = 'translateY(' + (y * 0.38) + 'px) scale(1.08)';
+      if (overlay) overlay.style.opacity   = String(0.18 + r * 0.62);
+      if (body)  { body.style.opacity      = String(Math.max(0, 1 - r * 1.6));
+                   body.style.transform    = 'translateY(' + (y * 0.22) + 'px)'; }
+    }
+    window.addEventListener('scroll', tick, { passive: true });
+    tick();
+  })();
+  </script>
+
+  {% endif %}
+{% endblock %}
