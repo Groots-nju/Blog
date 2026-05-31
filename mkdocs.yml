@@ -1,13 +1,14 @@
 # ── 基本信息 ──────────────────────────────────────
-site_name: 我的笔记
+site_name: Groot's Notes
 site_description: 记录学习路上的思考与发现
-site_author: Your Name
+site_author: Groot
+site_url: https://Groots-nju.github.io/Blog/
 
-# ── 仓库（发布到 GitHub 后取消注释）────────────────
-# repo_name: username/my-notes
-# repo_url: https://github.com/username/my-notes
+# ── 仓库 ──────────────────────────────────────────
+repo_name: Groots-nju/Blog
+repo_url: https://github.com/Groots-nju/Blog
 
-copyright: 'Copyright &copy; 2026 - Your Name'
+copyright: 'Copyright &copy; 2026 Groot'
 
 # ── 主题 ──────────────────────────────────────────
 theme:
@@ -21,33 +22,65 @@ theme:
       primary: deep purple
       accent: pink
       toggle:
-        icon: material/weather-sunny
+        icon: material/weather-night
         name: 切换到深色模式
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: deep purple
       accent: pink
       toggle:
-        icon: material/weather-night
+        icon: material/weather-sunny
         name: 切换到浅色模式
   features:
-    - navigation.tracking       # URL 锚点跟踪
-    - navigation.tabs           # 顶部导航栏
-    - navigation.tabs.sticky    # 导航栏固定
-    - navigation.sections       # 侧边栏分组
-    - navigation.expand         # 侧边栏展开
-    - navigation.top            # 一键回顶部
-    - navigation.footer         # 底部翻页
-    - content.code.copy         # 代码一键复制
-    - content.code.annotate     # 代码行注释
-    - search.highlight          # 搜索结果高亮
-    - search.suggest            # 搜索自动补全
-    - toc.follow                # 右侧目录跟随滚动
+    - navigation.instant          # AJAX 导航，切换主题不跳页
+    - navigation.instant.progress # 加载进度条
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky      # 顶部导航栏固定
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - content.code.copy
+    - content.code.annotate
+    - content.tooltips
+    - search.highlight
+    - search.suggest
+    - search.share
+    - toc.follow
+
+# ── 多语言切换 ─────────────────────────────────────
+extra:
+  alternate:
+    - name: 中文
+      link: /Blog/
+      lang: zh
+    - name: English
+      link: /Blog/en/
+      lang: en
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Groots-nju
+      name: GitHub
 
 # ── 插件 ──────────────────────────────────────────
 plugins:
   - search:
       separator: '[\s\-]'
+  - blog:
+      blog_dir: blog
+      post_date_format: long
+      post_url_date_format: yyyy/MM/dd
+      authors: true
+      authors_file: blog/.authors.yml
+      categories: true
+      categories_allowed:
+        - 生活
+        - 旅行
+        - 思考
+        - 技术
+        - Travel
+        - Life
 
 # ── Markdown 扩展 ──────────────────────────────────
 markdown_extensions:
@@ -55,7 +88,6 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.highlight:
       anchor_linenums: true
-      line_spans: __span
       pygments_lang_class: true
   - pymdownx.superfences:
       custom_fences:
@@ -75,9 +107,15 @@ markdown_extensions:
   - toc:
       permalink: true
 
-# ── 样式 ──────────────────────────────────────────
+# ── 样式 / 脚本 ────────────────────────────────────
 extra_css:
   - stylesheets/extra.css
+  - https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.3.0/css/glightbox.min.css
+
+extra_javascript:
+  - javascripts/gate.js
+  - https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.3.0/js/glightbox.min.js
+  - javascripts/extra.js
 
 # ── 导航 ──────────────────────────────────────────
 nav:
@@ -87,5 +125,9 @@ nav:
     - 山间晨雾: note1/page1.md
     - 樱花季: note1/page2.md
     - 海边黄昏: note1/page3.md
+  - 日志: blog/index.md
+  - 时间轴: timeline.md
+  - 旅行地图: map.md
+  - 标签云: tags.md
   - 关于本站: note2.md
   - 使用说明: guide.md

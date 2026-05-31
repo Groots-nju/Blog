@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>邀请码管理工具 — Groot's Notes</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0f0a1e;
+    color: #e2e8f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 1rem;
+  }
+  h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.4rem;
+       background: linear-gradient(135deg,#e85d7a,#a855f7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .sub { color: #94a3b8; margin-bottom: 2.5rem; font-size: 0.9rem; }
+
+  .card { background: #1e1535; border-radius: 16px; padding: 1.8rem; width: 100%; max-width: 640px; margin-bottom: 1.5rem; border: 1px solid #2d2050; }
+  .card h2 { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; color: #c4b5fd; }
+
+  .row { display: flex; gap: 0.6rem; margin-bottom: 0.8rem; }
+  input[type=text] {
+    flex: 1; background: #0f0a1e; border: 1.5px solid #3b2d6e; border-radius: 8px;
+    padding: 0.6rem 1rem; color: #e2e8f0; font-size: 0.95rem; outline: none;
+  }
+  input[type=text]:focus { border-color: #a855f7; }
+  input[type=number] {
+    width: 80px; background: #0f0a1e; border: 1.5px solid #3b2d6e; border-radius: 8px;
+    padding: 0.6rem 0.8rem; color: #e2e8f0; font-size: 0.95rem; outline: none; text-align: center;
+  }
+
+  button {
+    background: linear-gradient(135deg,#e85d7a,#a855f7); color: white;
+    border: none; border-radius: 8px; padding: 0.6rem 1.2rem;
+    font-weight: 700; font-size: 0.9rem; cursor: pointer; white-space: nowrap;
+    transition: opacity 0.2s;
+  }
+  button:hover { opacity: 0.85; }
+  button.secondary { background: #2d2050; }
+  button.danger { background: #7f1d1d; }
+
+  .code-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .code-row {
+    display: flex; align-items: center; gap: 0.6rem;
+    background: #0f0a1e; border-radius: 8px; padding: 0.6rem 0.8rem;
+    border: 1px solid #2d2050;
+  }
+  .code-label { flex: 1; font-size: 0.9rem; font-weight: 600; }
+  .code-plain { font-family: monospace; color: #86efac; font-size: 0.85rem; flex: 2; }
+  .code-hash  { font-family: monospace; color: #94a3b8; font-size: 0.72rem; flex: 3; word-break: break-all; }
+  .badge { font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 100px; font-weight: 700; }
+  .badge-active { background: rgba(134,239,172,0.15); color: #86efac; }
+  .badge-revoked { background: rgba(248,113,113,0.15); color: #f87171; }
+
+  textarea {
+    width: 100%; background: #0f0a1e; border: 1.5px solid #3b2d6e; border-radius: 8px;
+    padding: 1rem; color: #86efac; font-family: monospace; font-size: 0.8rem;
+    resize: vertical; min-height: 140px; outline: none; line-height: 1.6;
+  }
+  textarea:focus { border-color: #a855f7; }
+
+  .tip { font-size: 0.8rem; color: #64748b; margin-top: 0.6rem; line-height: 1.5; }
+  .tip code { background: #1e1535; padding: 0.1rem 0.4rem; border-radius: 4px; color: #c4b5fd; }
+  .empty { color: #475569; font-size: 0.85rem; text-align: center; padding: 1rem; }
+
+  .steps { counter-reset: step; display: flex; flex-direction: column; gap: 0.8rem; }
+  .step { display: flex; gap: 0.8rem; align-items: flex-start; font-size: 0.87rem; color: #94a3b8; line-height: 1.5; }
+  .step::before { counter-increment: step; content: counter(step); min-width: 24px; height: 24px;
+    background: #2d2050; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.75rem; color: #c4b5fd; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<h1>🔐 邀请码管理工具</h1>
+<p class="sub">在本地运行，不上传任何数据</p>
+
+<!-- 生成邀请码 -->
+<div class="card">
+  <h2>① 生成新邀请码</h2>
+  <div class="row">
+    <input type="text" id="label-input" placeholder="备注（例如：发给小明）" />
+    <input type="number" id="count-input" value="1" min="1" max="20" title="批量生成数量" />
+    <button onclick="generateCode()">生成</button>
+  </div>
+  <div class="tip">
+    数字填 <code>1</code> 生成单个，填 <code>5</code> 一次生成5个随机码。
+  </div>
+</div>
+
+<!-- 邀请码列表 -->
+<div class="card">
+  <h2>② 邀请码列表</h2>
+  <div class="code-list" id="code-list">
+    <div class="empty">还没有邀请码，点上方「生成」按钮创建。</div>
+  </div>
+</div>
+
+<!-- 复制到配置 -->
+<div class="card">
+  <h2>③ 复制哈希到 gate.js</h2>
+  <textarea id="hash-output" readonly placeholder="生成邀请码后，哈希值会出现在这里..."></textarea>
+  <div style="display:flex;gap:0.6rem;margin-top:0.8rem;">
+    <button onclick="copyHashes()">复制全部哈希</button>
+    <button class="secondary" onclick="clearRevoked()">清除已撤销</button>
+    <button class="danger" onclick="clearAll()">清空全部</button>
+  </div>
+  <div class="tip" style="margin-top:0.8rem;">
+    复制后打开 <code>docs/javascripts/gate.js</code>，替换 <code>var GATE_CODES = [...]</code> 里的内容，然后重新发布。
+  </div>
+</div>
+
+<!-- 使用步骤 -->
+<div class="card">
+  <h2>📋 使用步骤</h2>
+  <div class="steps">
+    <div class="step">在上方生成邀请码，把明文码（绿色）发给朋友</div>
+    <div class="step">点「复制全部哈希」，打开 <code>docs/javascripts/gate.js</code></div>
+    <div class="step">找到 <code>var GATE_CODES = [</code> 那行，把复制的内容粘贴进去替换</div>
+    <div class="step">终端运行 <code>git add . && git commit -m "update codes" && git push && mkdocs gh-deploy</code></div>
+    <div class="step">把明文邀请码发给朋友，他们输入后就能进入网站</div>
+    <div class="step">撤销某人：点「撤销」按钮，重新复制哈希并发布即可</div>
+  </div>
+</div>
+
+<script>
+var SALT = 'groot_notes_2026';
+var codes = JSON.parse(localStorage.getItem('gate_codes') || '[]');
+
+async function sha256(str) {
+  var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function randomCode() {
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  return Array.from({length: 10}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
+async function generateCode() {
+  var label = document.getElementById('label-input').value.trim() || '未命名';
+  var count = parseInt(document.getElementById('count-input').value) || 1;
+  for (var i = 0; i < count; i++) {
+    var plain = randomCode();
+    var hash  = await sha256(plain + SALT);
+    codes.push({ id: Date.now() + i, label: count > 1 ? label + '-' + (i+1) : label, plain, hash, revoked: false, created: new Date().toLocaleDateString('zh') });
+  }
+  save(); render();
+  document.getElementById('label-input').value = '';
+}
+
+function revokeCode(id) {
+  var c = codes.find(c => c.id === id);
+  if (c) { c.revoked = !c.revoked; save(); render(); }
+}
+
+function deleteCode(id) {
+  codes = codes.filter(c => c.id !== id);
+  save(); render();
+}
+
+function clearRevoked() {
+  codes = codes.filter(c => !c.revoked);
+  save(); render();
+}
+
+function clearAll() {
+  if (confirm('确定清空所有邀请码？')) { codes = []; save(); render(); }
+}
+
+function save() { localStorage.setItem('gate_codes', JSON.stringify(codes)); }
+
+function render() {
+  var list = document.getElementById('code-list');
+  var active = codes.filter(c => !c.revoked);
+
+  if (!codes.length) {
+    list.innerHTML = '<div class="empty">还没有邀请码，点上方「生成」按钮创建。</div>';
+    document.getElementById('hash-output').value = '';
+    return;
+  }
+
+  list.innerHTML = codes.map(c => `
+    <div class="code-row" style="opacity:${c.revoked?0.45:1}">
+      <div style="min-width:90px">
+        <div class="code-label">${c.label}</div>
+        <div style="font-size:0.7rem;color:#475569">${c.created}</div>
+      </div>
+      <div class="code-plain">${c.plain}</div>
+      <span class="badge ${c.revoked?'badge-revoked':'badge-active'}">${c.revoked?'已撤销':'有效'}</span>
+      <button class="secondary" style="padding:0.3rem 0.7rem;font-size:0.75rem" onclick="revokeCode(${c.id})">${c.revoked?'恢复':'撤销'}</button>
+      <button class="danger" style="padding:0.3rem 0.7rem;font-size:0.75rem" onclick="deleteCode(${c.id})">删除</button>
+    </div>
+  `).join('');
+
+  // 更新哈希输出（只输出有效的）
+  var hashes = active.map(c => `  "${c.hash}", // ${c.label}`).join('\n');
+  document.getElementById('hash-output').value = hashes;
+}
+
+function copyHashes() {
+  var ta = document.getElementById('hash-output');
+  if (!ta.value) { alert('还没有有效的邀请码'); return; }
+  navigator.clipboard.writeText(ta.value).then(() => {
+    var btn = event.target;
+    btn.textContent = '已复制 ✓';
+    setTimeout(() => btn.textContent = '复制全部哈希', 1500);
+  });
+}
+
+render();
+</script>
+</body>
+</html>

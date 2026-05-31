@@ -1,49 +1,22 @@
 {% extends "base.html" %}
 
-{% block scripts %}
-  {{ super() }}
-  <script>
-  /* 切换明暗模式时保持滚动位置 */
-  (function () {
-    var key = '__mdx_scroll__';
-    var saved = sessionStorage.getItem(key);
-    if (saved !== null) {
-      window.scrollTo(0, parseInt(saved, 10));
-      sessionStorage.removeItem(key);
-    }
-    document.addEventListener('click', function (e) {
-      if (e.target.closest('[data-md-component="palette"] label')) {
-        sessionStorage.setItem(key, String(window.scrollY || 0));
-      }
-    });
-  })();
-  </script>
-{% endblock %}
-
-{% block content %}
-  {{ super() }}
-  {% include "partials/comments.html" %}
-{% endblock %}
-
 {% block tabs %}
   {{ super() }}
   {% if page and page.meta and page.meta.template == "home.html" %}
   <style>
+    /* 隐藏默认主体，首页完全自定义 */
+    .md-header { position: initial }
     .md-main__inner { margin: 0 }
     .md-content { display: none }
     @media screen and (min-width: 60em)    { .md-sidebar--secondary { display: none } }
     @media screen and (min-width: 76.25em) { .md-sidebar--primary   { display: none } }
   </style>
 
-  <!-- ═══ HERO SLIDESHOW ═══ -->
+  <!-- ═══ HERO ═══ -->
   <div class="mdx-hero-wrap">
-    <!-- 背景图层：多张图片淡入淡出轮播 -->
-    <div class="mdx-slide mdx-slide--1" style="background-image:url('{{ base_url }}/assets/56.png')"></div>
-    <div class="mdx-slide mdx-slide--2" style="background-image:url('https://images.unsplash.com/photo-1538332576228-eb5b4c4de6f5?w=1800&q=85')"></div>
-    <div class="mdx-slide mdx-slide--3" style="background-image:url('https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1800&q=85')"></div>
-    <div class="mdx-slide mdx-slide--4" style="background-image:url('https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=1800&q=85')"></div>
+    <div class="mdx-hero-bg" id="heroBg"
+         style="background-image: url('{{ base_url }}/assets/56.png')"></div>
     <div class="mdx-hero-overlay" id="heroOverlay"></div>
-
     <div class="mdx-hero-body" id="heroBody">
       <div class="md-grid">
         <p class="mdx-hero-eyebrow">✦ 欢迎来到我的空间</p>
@@ -51,18 +24,15 @@
         <p class="mdx-hero-desc">{{ page.meta.description | default("") }}</p>
         <div class="mdx-hero-btns">
           {% if page.meta.hero_button %}
-          <a href="{{ base_url }}/{{ page.meta.hero_button_link | default('') }}" class="mdx-btn mdx-btn--primary">
+          <a href="{{ page.meta.hero_button_link | default('#') }}" class="mdx-btn mdx-btn--primary">
             {{ page.meta.hero_button }}
           </a>
           {% endif %}
           {% if page.meta.hero_button2 %}
-          <a href="{{ base_url }}/{{ page.meta.hero_button2_link | default('') }}" class="mdx-btn">
+          <a href="{{ page.meta.hero_button2_link | default('#') }}" class="mdx-btn">
             {{ page.meta.hero_button2 }}
           </a>
           {% endif %}
-          <button class="mdx-btn mdx-btn--ghost" onclick="goRandom()" title="随机跳转一篇笔记">
-            🎲 随机一篇
-          </button>
         </div>
       </div>
       <div class="mdx-hero-arrow">
@@ -82,25 +52,10 @@
           <h3>自然与旅行</h3>
           <p>走过的风景，值得被好好记录下来。</p>
         </a>
-        <a class="mdx-feat-card" href="{{ base_url }}/blog/">
-          <div class="mdx-feat-icon">📝</div>
-          <h3>日志</h3>
-          <p>带时间、分类和作者信息的日常记录。</p>
-        </a>
-        <a class="mdx-feat-card" href="{{ base_url }}/timeline/">
-          <div class="mdx-feat-icon">🕰️</div>
-          <h3>时间轴</h3>
-          <p>按时间线回顾所有笔记与旅行足迹。</p>
-        </a>
-        <a class="mdx-feat-card" href="{{ base_url }}/map/">
-          <div class="mdx-feat-icon">🗺️</div>
-          <h3>旅行地图</h3>
-          <p>在地图上标注走过的地方，点击跳转文章。</p>
-        </a>
-        <a class="mdx-feat-card" href="{{ base_url }}/tags/">
-          <div class="mdx-feat-icon">🏷️</div>
-          <h3>标签云</h3>
-          <p>按话题浏览所有笔记内容。</p>
+        <a class="mdx-feat-card" href="{{ base_url }}/note2/">
+          <div class="mdx-feat-icon">✏️</div>
+          <h3>关于本站</h3>
+          <p>这个网站是怎么搭建的，以及我在这里做什么。</p>
         </a>
         <a class="mdx-feat-card" href="{{ base_url }}/guide/">
           <div class="mdx-feat-icon">📖</div>
@@ -156,18 +111,19 @@
 
   <script>
   (function () {
+    var bg      = document.getElementById('heroBg');
     var overlay = document.getElementById('heroOverlay');
     var body    = document.getElementById('heroBody');
+
     function tick() {
-      var y = window.scrollY || 0;
+      var y = window.scrollY || window.pageYOffset;
       var H = window.innerHeight;
       var r = Math.min(y / (H * 0.65), 1);
-      if (overlay) overlay.style.opacity = String(0.18 + r * 0.62);
-      if (body)  { body.style.opacity   = String(Math.max(0, 1 - r * 1.6));
-                   body.style.transform = 'translateY(' + (y * 0.22) + 'px)'; }
+      if (bg)      bg.style.transform      = 'translateY(' + (y * 0.38) + 'px) scale(1.08)';
+      if (overlay) overlay.style.opacity   = String(0.18 + r * 0.62);
+      if (body)  { body.style.opacity      = String(Math.max(0, 1 - r * 1.6));
+                   body.style.transform    = 'translateY(' + (y * 0.22) + 'px)'; }
     }
-    window.removeEventListener('scroll', window.__heroTick);
-    window.__heroTick = tick;
     window.addEventListener('scroll', tick, { passive: true });
     tick();
   })();

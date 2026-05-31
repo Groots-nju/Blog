@@ -4,6 +4,52 @@
 
 ---
 
+## 发布一篇日志（带头像、时间、分类）
+
+日志和普通笔记不同，会显示作者头像、发布时间和所属分类，像博客一样。
+
+### 新建日志文件
+
+在 `docs/blog/posts/` 文件夹里创建一个 `.md` 文件，文件名建议用日期开头，比如 `2026-06-01-my-post.md`。
+
+文件顶部必须有这段配置：
+
+```yaml
+---
+date: 2026-06-01           ← 发布日期
+authors:
+  - groot                  ← 作者（对应 .authors.yml 里的 key）
+categories:
+  - 生活                   ← 分类，可以多个
+description: 这篇文章讲了什么  ← 摘要（显示在列表页）
+---
+
+# 文章标题
+
+正文内容...
+
+<!-- more -->   ← 这行之前的内容显示在列表摘要，这行之后不显示
+
+更多正文...
+```
+
+### 修改作者头像和信息
+
+打开 `docs/blog/.authors.yml`，修改 avatar 那行，换成你自己的头像地址：
+
+```yaml
+authors:
+  groot:
+    name: Groot
+    description: 笔记作者
+    avatar: https://你的头像图片地址
+    url: https://github.com/Groots-nju
+```
+
+GitHub 头像地址格式：`https://github.com/你的用户名.png`
+
+---
+
 ## 添加一篇新笔记
 
 ### 第一步：创建 `.md` 文件
